@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from numpy.random import RandomState
 import pickle
 import os
+from typing import NamedTuple
 
 def save_data(sim, path):
     with open(path, "wb") as file:
@@ -56,7 +57,7 @@ def plot_sigma_dist(sigmas:np.ndarray):
 
     plt.show()
 
-def show_generation_trajectories(gen):
+def show_generation_trajectories(gen, title="trajectories"):
     ''' display a 2d histogram of the positions of the walkers
     in: Generation'''
 
@@ -69,8 +70,24 @@ def show_generation_trajectories(gen):
     plt.colorbar(pcm, label="# visits", pad=0)
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.title("trajectories")
+    plt.title(title)
     plt.show()
+
+
+class ParamSpin(NamedTuple):
+    n_steps: int
+    n_spins: int
+    n_targets: int
+
+    T: float
+    nu: float
+
+    v: float
+
+    r_eat: float
+    r_detect: float
+
+    init_target_method: str
 
 
 class Simulation:
@@ -135,8 +152,8 @@ class Generation:
 
     def plot_scores(self):
         plt.scatter(self.sigmas, self.scores)
-        plt.xlabel = "sigmas"
-        plt.ylabel = "scores"
+        plt.xlabel("sigmas")
+        plt.ylabel("scores")
         plt.show()
 
 class Instance:
@@ -144,13 +161,14 @@ class Instance:
         self.sim_steps = params["gen_length"]
 
         # initialize agent
-        self.agent = Agent(sigma_evolved, params)
+        self.agent = AgentNormal(sigma_evolved, params)
         self.agent_history = np.zeros((self.sim_steps, 2))
 
         # place food
         self.num_food = params["num_food"]
         self.normal_scale = params["normal_scale"]
         self.food_items = Simulation.prng.normal(loc=0, scale=self.normal_scale, size=(self.num_food, 2))
+
 
     def update(self):
         for i in range(self.sim_steps):
@@ -170,15 +188,28 @@ class Instance:
         return ax
 
 class Agent:
-    def __init__(self, sigma, params) -> None:
-        self.sigma = sigma
+    def __init__(self, params) -> None:
+
         self.detection_radius = params["detection_radius"]
+        self.step_length = params["step_length"]
 
         self.pos = np.zeros(2)
         self.rotation = 0
-        self.step_length = params["step_length"]
 
         self.score = 0
+
+    def rotate(self):
+        # implement for children
+        pass
+
+    def update(self):
+        # implement for children
+        self.pos = self.pos + self.step_length*np.array([np.cos(self.rotation), np.sin(self.rotation)])
+
+class AgentNormal(Agent):
+    def __init__(self, sigma, params) -> None:
+        super().__init__( params)
+        self.sigma = sigma
 
     def rotate(self):
         # can be made more advanced
