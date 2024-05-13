@@ -58,8 +58,7 @@ class Instance():
         else:
             # normally, just use all the created targets
             self.agent_targets = self.targets
-            self.agent = Agent(0+0j, params.n_spins, params.n_targets, params.T, params.nu, v0=params.v)
-
+            self.agent = Agent(start_pos=0+0j, n_spins=params.n_spins, n_targets=params.n_targets, T=params.T, nu=params.nu, v0=params.v)
         # container for results
         self.agent_history = np.zeros(self.params.n_steps, dtype="complex")
         self.eating_history = np.zeros(1, dtype=complex)
