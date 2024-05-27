@@ -54,11 +54,11 @@ class Instance():
         if self.params.sim_type == "const_targets":
             # assign the closest #max_targets as the active targets
             self.agent_targets = self.targets[np.argpartition(np.abs(self.targets), self.params.max_targets)[:self.params.max_targets]]
-            self.agent = Agent(0+0j, params.n_spins, params.max_targets, params.T, params.nu, v0=params.v)
+            self.agent = TargetAgent(0+0j, params.n_spins, params.max_targets, params.T, params.nu, v0=params.v)
         else:
             # normally, just use all the created targets
             self.agent_targets = self.targets
-            self.agent = Agent(start_pos=0+0j, n_spins=params.n_spins, n_targets=params.n_targets, T=params.T, nu=params.nu, v0=params.v)
+            self.agent = TargetAgent(start_pos=0+0j, n_spins=params.n_spins, n_targets=params.n_targets, T=params.T, nu=params.nu, v0=params.v)
         # container for results
         self.agent_history = np.zeros(self.params.n_steps, dtype="complex")
         self.eating_history = np.zeros(1, dtype=complex)
@@ -182,7 +182,7 @@ class Instance():
         plt.scatter(self.agent_targets.real, self.agent_targets.imag)
         plt.show()
 
-class Agent():
+class TargetAgent():
     def __init__(self, start_pos,  n_spins, n_targets, T, nu, v0) -> None:
 
         self.pos = start_pos
